@@ -206,6 +206,9 @@ if __name__ == "__main__":
     parser = arg_parser(ident="alice", port=8030)
     args = parser.parse_args()
 
+    ENABLE_PTVSD = os.getenv("ENABLE_PTVSD_FABER", "").lower()
+    ENABLE_PTVSD = ENABLE_PTVSD and ENABLE_PTVSD not in ("false", "0")
+    
     ENABLE_PYDEVD_PYCHARM = os.getenv("ENABLE_PYDEVD_PYCHARM", "").lower()
     ENABLE_PYDEVD_PYCHARM = ENABLE_PYDEVD_PYCHARM and ENABLE_PYDEVD_PYCHARM not in (
         "false",
@@ -215,6 +218,18 @@ if __name__ == "__main__":
     PYDEVD_PYCHARM_CONTROLLER_PORT = int(
         os.getenv("PYDEVD_PYCHARM_CONTROLLER_PORT", 5001)
     )
+    # --debug to use microsoft's visual studio remote debugger
+    if ENABLE_PTVSD or "--debug" in args:
+        try:
+            import ptvsd
+
+            ptvsd.enable_attach(address = ('0.0.0.0', 5677))
+            print("ptvsd is running")
+            print("=== Waiting for debugger to attach ===")
+            # To pause execution until the debugger is attached:
+            ptvsd.wait_for_attach()
+        except ImportError:
+            print("ptvsd library was not found")
 
     if ENABLE_PYDEVD_PYCHARM:
         try:
