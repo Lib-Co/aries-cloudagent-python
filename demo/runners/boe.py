@@ -72,7 +72,10 @@ class BoEAgent(AriesAgent):
         return self._connection_ready.done() and self._connection_ready.result()
 
     def generate_credential_offer(self, aip, cred_type, cred_def_id, exchange_tracing):
+        expiration_period = 1
         d = datetime.date.today()
+        valid_to = datetime.date(d.year + expiration_period, d.month, d.day)
+        valid_to_format = "%Y%m%d"
         if aip == 10:
             # define attributes to send for credential
             self.cred_attrs[cred_def_id] = {
@@ -87,6 +90,7 @@ class BoEAgent(AriesAgent):
                 "firm_name": "test",
                 "lei": "test",
                 "user_role": "test",
+                "valid_to_dateint": valid_to.strftime(valid_to_format),
                 "timestamp": str(int(time.time())),
             }
 
@@ -123,6 +127,7 @@ class BoEAgent(AriesAgent):
                     "firm_name": "test",
                     "lei": "test",
                     "user_role": "test",
+                    "valid_to_dateint": valid_to.strftime(valid_to_format),
                     "timestamp": str(int(time.time())),
                 }
 
@@ -168,6 +173,7 @@ class BoEAgent(AriesAgent):
                                     "firm_name": "TEST",
                                     "lei": "TEST",
                                     "user_role": "TEST",
+                                    "valid_to_dateint": "TEST",
                                     "timestamp": "TEST",
                                 },
                             },
@@ -186,22 +192,27 @@ class BoEAgent(AriesAgent):
     def generate_proof_request_web_request(
         self, aip, cred_type, revocation, exchange_tracing, connectionless=False
     ):
+        expiration_period = 1
+        d = datetime.date.today()
+        valid_to = datetime.date(d.year + expiration_period, d.month, d.day)
+        valid_to_format = "%Y%m%d"
 
         if aip == 10:
             req_attrs = [
                 {
-                    "name": "name",
+                    "name": "first_name",
                     "restrictions": [{"schema_name": "identification schema"}],
                 },
                 {
-                    "name": "date",
+                    "name": "surname",
                     "restrictions": [{"schema_name": "identification schema"}],
                 },
+
             ]
             if revocation:
                 req_attrs.append(
                     {
-                        "name": "identification",
+                        "name": "lei",
                         "restrictions": [{"schema_name": "identification schema"}],
                         "non_revoked": {"to": int(time.time() - 1)},
                     },
@@ -209,7 +220,7 @@ class BoEAgent(AriesAgent):
             else:
                 req_attrs.append(
                     {
-                        "name": "identification",
+                        "name": "lei",
                         "restrictions": [{"schema_name": "identification schema"}],
                     }
                 )
@@ -220,15 +231,15 @@ class BoEAgent(AriesAgent):
                 )
             req_preds = [
                 # test zero-knowledge proofs
-                #{
-                    #"name": "birthdate_dateint",
-                    #"p_type": "<=",
-                    #"p_value": int(birth_date.strftime(birth_date_format)),
-                    #"restrictions": [{"schema_name": "identification schema"}],
-                #}
+                {
+                    "name": "valid_to_dateint",
+                    "p_type": ">=",
+                    "p_value": int(valid_to.strftime(valid_to_format)),
+                    "restrictions": [{"schema_name": "identification schema"}],
+                }
             ]
             indy_proof_request = {
-                "name": "Proof of Firm LEI",
+                "name": "Proof of Reporter",
                 "version": "1.0",
                 "requested_attributes": {
                     f"0_{req_attr['name']}_uuid": req_attr for req_attr in req_attrs
@@ -253,19 +264,18 @@ class BoEAgent(AriesAgent):
             if cred_type == CRED_FORMAT_INDY:
                 req_attrs = [
                     {
-                "host": "localhost",
-                        "name": "name",
+                        "name": "first_name",
                         "restrictions": [{"schema_name": "identification schema"}],
                     },
                     {
-                        "name": "date",
+                        "name": "surname",
                         "restrictions": [{"schema_name": "identification schema"}],
                     },
                 ]
                 if revocation:
                     req_attrs.append(
                         {
-                            "name": "identification",
+                            "name": "lei",
                             "restrictions": [{"schema_name": "identification schema"}],
                             "non_revoked": {"to": int(time.time() - 1)},
                         },
@@ -273,7 +283,7 @@ class BoEAgent(AriesAgent):
                 else:
                     req_attrs.append(
                         {
-                            "name": "identification",
+                            "name": "lei",
                             "restrictions": [{"schema_name": "identification schema"}],
                         }
                     )
@@ -285,14 +295,14 @@ class BoEAgent(AriesAgent):
                 req_preds = [
                     # test zero-knowledge proofs
                     {
-                        #"name": "birthdate_dateint",
-                        #"p_type": "<=",
-                        #"p_value": int(birth_date.strftime(birth_date_format)),
-                        #"restrictions": [{"schema_name": "identification schema"}],
+                        "name": "valid_to_dateint",
+                        "p_type": ">=",
+                        "p_value": int(valid_to.strftime(valid_to_format)),
+                        "restrictions": [{"schema_name": "identification schema"}],
                     }
                 ]
                 indy_proof_request = {
-                    "name": "Proof of Firm LEI",
+                    "name": "Proof of Reporter",
                     "version": "1.0",
                     "requested_attributes": {
                         f"0_{req_attr['name']}_uuid": req_attr for req_attr in req_attrs
@@ -417,6 +427,7 @@ async def main(args):
             "firm_name",
             "lei",
             "user_role",
+            "valid_to_dateint",
             "timestamp",
         ]
         if boe_agent.cred_type == CRED_FORMAT_INDY:
