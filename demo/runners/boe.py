@@ -71,21 +71,25 @@ class BoEAgent(AriesAgent):
     def connection_ready(self):
         return self._connection_ready.done() and self._connection_ready.result()
 
-    def generate_credential_offer(self, aip, cred_type, cred_def_id, exchange_tracing):
+    async def generate_credential_offer(self, aip, cred_type, cred_def_id, exchange_tracing):
         expiration_period = 1
         d = datetime.date.today()
         valid_to = datetime.date(d.year + expiration_period, d.month, d.day)
         valid_to_format = "%Y%m%d"
+
+        first_name = await prompt("Enter First Name: ")
+
         if aip == 10:
+            
             # define attributes to send for credential
             self.cred_attrs[cred_def_id] = {
-                #"first_name": await prompt("Enter First Name: "),
+                "first_name": first_name,
                 #"surname": await prompt("Enter Surname: "),
                 #"firm_name": await prompt("Enter Firm Name: "),
                 #"lei": await prompt("Enter Firm LEI: "),
                 #"user_role": "Principal User",
                 #"timestamp": str(int(time.time())),
-                "first_name": "test",
+                #"first_name": "test",
                 "surname": "test",
                 "firm_name": "test",
                 "lei": "test",
@@ -120,9 +124,9 @@ class BoEAgent(AriesAgent):
                     #"lei": await prompt("Enter Firm LEI: "),
                     #"user_role": "Principal User",
                     #"timestamp": str(int(time.time())),
-                    #await
-
-                    "first_name": "test",
+                    
+                    "first_name": first_name,
+                    #"first_name": "test",
                     "surname": "test",
                     "firm_name": "test",
                     "lei": "test",
@@ -524,7 +528,7 @@ async def main(args):
                 log_status("#13 Issue credential offer to X")
 
                 if boe_agent.aip == 10:
-                    offer_request = boe_agent.agent.generate_credential_offer(
+                    offer_request = await boe_agent.agent.generate_credential_offer(
                         boe_agent.aip, None, boe_agent.cred_def_id, exchange_tracing
                     )
                     await boe_agent.agent.admin_POST(
@@ -533,7 +537,7 @@ async def main(args):
 
                 elif boe_agent.aip == 20:
                     if boe_agent.cred_type == CRED_FORMAT_INDY:
-                        offer_request = boe_agent.agent.generate_credential_offer(
+                        offer_request = await boe_agent.agent.generate_credential_offer(
                             boe_agent.aip,
                             boe_agent.cred_type,
                             boe_agent.cred_def_id,
@@ -541,7 +545,7 @@ async def main(args):
                         )
 
                     elif boe_agent.cred_type == CRED_FORMAT_JSON_LD:
-                        offer_request = boe_agent.agent.generate_credential_offer(
+                        offer_request = await boe_agent.agent.generate_credential_offer(
                             boe_agent.aip,
                             boe_agent.cred_type,
                             None,
