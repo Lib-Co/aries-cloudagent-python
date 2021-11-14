@@ -6314,7 +6314,7 @@
           "description" : "Attribute names and value",
           "additionalProperties" : {
             "type" : "string",
-            "example" : "alice"
+            "example" : "beeds_user"
           }
         },
         "cred_def_id" : {
@@ -10793,7 +10793,7 @@
           "type" : "array",
           "items" : {
             "type" : "string",
-            "example" : "https://example.org/examples/degree.json",
+            "example" : "https://example.org/examples/identification.json",
             "description" : "Schema identifier"
           }
         },

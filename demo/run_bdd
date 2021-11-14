@@ -84,7 +84,7 @@ do
     continue
   ;;
   --bg)
-    if [ "${AGENT}" = "alice" ] || [ "${AGENT}" = "faber" ] || [ "${AGENT}" = "acme" ]; then
+    if [ "${AGENT}" = "beeds_user" ] || [ "${AGENT}" = "boe" ] || [ "${AGENT}" = "acme" ]; then
       DOCKER_OPTS="-d"
       echo -e "\nRunning in ${AGENT} in the background. Note that you cannot use the command line console in this mode."
       echo To see the logs use: \"docker logs ${AGENT}\".
@@ -126,7 +126,7 @@ AGENT_PORT=8020
 AGENT_PORT_RANGE=8020-8079
 
 echo "Preparing agent image..."
-docker build -q -t faber-alice-demo -f ../docker/Dockerfile.demo .. || exit 1
+docker build -q -t boe-beeds_user-demo -f ../docker/Dockerfile.demo .. || exit 1
 docker build -q -t aries-bdd-image -f ../docker/Dockerfile.bdd .. || exit 1
 
 if [ ! -z "$DOCKERHOST" ]; then

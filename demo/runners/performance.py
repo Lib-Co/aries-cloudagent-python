@@ -154,7 +154,7 @@ class AliceAgent(BaseAgent):
             "--auto-store-credential",
             "--monitor-ping",
         ]
-        self.timing_log = "logs/alice_perf.log"
+        self.timing_log = "logs/beeds_user_perf.log"
 
     async def fetch_credential_definition(self, cred_def_id):
         return await self.admin_GET(f"/credential-definitions/{cred_def_id}")
@@ -203,9 +203,9 @@ class FaberAgent(BaseAgent):
             % (random.randint(1, 101), random.randint(1, 101), random.randint(1, 101))
         )
         schema_body = {
-            "schema_name": "degree schema",
+            "schema_name": "identification schema",
             "schema_version": version,
-            "attributes": ["name", "date", "degree", "age"],
+            "attributes": ["name", "date", "identification", "age"],
         }
         schema_response = await self.admin_POST("/schemas", schema_body)
         self.schema_id = schema_response["schema_id"]
@@ -273,15 +273,15 @@ async def main(
         print("Error retrieving ledger genesis transactions")
         sys.exit(1)
 
-    alice = None
-    faber = None
-    alice_mediator_agent = None
-    faber_mediator_agent = None
+    beeds_user = None
+    boe = None
+    beeds_user_mediator_agent = None
+    boe_mediator_agent = None
     run_timer = log_timer("Total runtime:")
     run_timer.start()
 
     try:
-        alice = AliceAgent(
+        beeds_user = AliceAgent(
             start_port,
             genesis_data=genesis,
             timing=show_timing,
@@ -289,9 +289,9 @@ async def main(
             mediation=mediation,
             wallet_type=wallet_type,
         )
-        await alice.listen_webhooks(start_port + 2)
+        await beeds_user.listen_webhooks(start_port + 2)
 
-        faber = FaberAgent(
+        boe = FaberAgent(
             start_port + 3,
             genesis_data=genesis,
             timing=show_timing,
@@ -300,68 +300,68 @@ async def main(
             mediation=mediation,
             wallet_type=wallet_type,
         )
-        await faber.listen_webhooks(start_port + 5)
-        await faber.register_did()
+        await boe.listen_webhooks(start_port + 5)
+        await boe.register_did()
 
         with log_timer("Startup duration:"):
-            await alice.start_process()
-            await faber.start_process()
+            await beeds_user.start_process()
+            await boe.start_process()
 
             if mediation:
-                alice_mediator_agent = await start_mediator_agent(
+                beeds_user_mediator_agent = await start_mediator_agent(
                     start_port + 8, genesis
                 )
-                if not alice_mediator_agent:
+                if not beeds_user_mediator_agent:
                     raise Exception("Mediator agent returns None :-(")
-                faber_mediator_agent = await start_mediator_agent(
+                boe_mediator_agent = await start_mediator_agent(
                     start_port + 11, genesis
                 )
-                if not faber_mediator_agent:
+                if not boe_mediator_agent:
                     raise Exception("Mediator agent returns None :-(")
             else:
-                alice_mediator_agent = None
-                faber_mediator_agent = None
+                beeds_user_mediator_agent = None
+                boe_mediator_agent = None
 
         with log_timer("Connect duration:"):
             if multitenant:
                 # create an initial managed sub-wallet (also mediated)
-                await alice.register_or_switch_wallet(
+                await beeds_user.register_or_switch_wallet(
                     "Alice.initial",
                     webhook_port=None,
-                    mediator_agent=alice_mediator_agent,
+                    mediator_agent=beeds_user_mediator_agent,
                 )
-                await faber.register_or_switch_wallet(
+                await boe.register_or_switch_wallet(
                     "Faber.initial",
                     public_did=True,
                     webhook_port=None,
-                    mediator_agent=faber_mediator_agent,
+                    mediator_agent=boe_mediator_agent,
                 )
             elif mediation:
                 # we need to pre-connect the agent(s) to their mediator (use the same
                 # mediator for both)
-                if not await connect_wallet_to_mediator(alice, alice_mediator_agent):
+                if not await connect_wallet_to_mediator(beeds_user, beeds_user_mediator_agent):
                     log_msg("Mediation setup FAILED :-(")
                     raise Exception("Mediation setup FAILED :-(")
-                if not await connect_wallet_to_mediator(faber, faber_mediator_agent):
+                if not await connect_wallet_to_mediator(boe, boe_mediator_agent):
                     log_msg("Mediation setup FAILED :-(")
                     raise Exception("Mediation setup FAILED :-(")
 
-            invite = await faber.get_invite(use_did_exchange)
-            await alice.receive_invite(invite["invitation"])
-            await asyncio.wait_for(faber.detect_connection(), 30)
+            invite = await boe.get_invite(use_did_exchange)
+            await beeds_user.receive_invite(invite["invitation"])
+            await asyncio.wait_for(boe.detect_connection(), 30)
 
         if action != "ping":
             with log_timer("Publish duration:"):
-                await faber.publish_defs(revocation)
+                await boe.publish_defs(revocation)
             # cache the credential definition
-            await alice.fetch_credential_definition(faber.credential_definition_id)
+            await beeds_user.fetch_credential_definition(boe.credential_definition_id)
 
         if show_timing:
-            await alice.reset_timing()
-            await faber.reset_timing()
+            await beeds_user.reset_timing()
+            await boe.reset_timing()
             if mediation:
-                await alice_mediator_agent.reset_timing()
-                await faber_mediator_agent.reset_timing()
+                await beeds_user_mediator_agent.reset_timing()
+                await boe_mediator_agent.reset_timing()
 
         batch_size = 100
 
@@ -369,17 +369,17 @@ async def main(
 
         def done_propose(fut: asyncio.Task):
             semaphore.release()
-            alice.check_task_exception(fut)
+            beeds_user.check_task_exception(fut)
 
         def done_send(fut: asyncio.Task):
             semaphore.release()
-            faber.check_task_exception(fut)
+            boe.check_task_exception(fut)
 
         def test_cred(index: int) -> dict:
             return {
                 "name": "Alice Smith",
                 "date": f"{2020+index}-05-28",
-                "degree": "Maths",
+                "identification": "Maths",
                 "age": "24",
             }
 
@@ -388,8 +388,8 @@ async def main(
             comment = f"propose test credential {index}"
             attributes = test_cred(index)
             asyncio.ensure_future(
-                alice.propose_credential(
-                    attributes, faber.credential_definition_id, comment, not revocation
+                beeds_user.propose_credential(
+                    attributes, boe.credential_definition_id, comment, not revocation
                 )
             ).add_done_callback(done_propose)
 
@@ -398,7 +398,7 @@ async def main(
             comment = f"issue test credential {index}"
             attributes = test_cred(index)
             asyncio.ensure_future(
-                faber.send_credential(attributes, comment, not revocation)
+                boe.send_credential(attributes, comment, not revocation)
             ).add_done_callback(done_send)
 
         async def check_received_creds(agent, issue_count, pb):
@@ -422,7 +422,7 @@ async def main(
 
         async def send_ping(index: int):
             await semaphore.acquire()
-            asyncio.ensure_future(faber.send_ping(str(index))).add_done_callback(
+            asyncio.ensure_future(boe.send_ping(str(index))).add_done_callback(
                 done_send
             )
 
@@ -446,13 +446,13 @@ async def main(
                     break
 
         if action == "ping":
-            recv_timer = faber.log_timer(f"Completed {issue_count} ping exchanges in")
-            batch_timer = faber.log_timer(f"Started {batch_size} ping exchanges in")
+            recv_timer = boe.log_timer(f"Completed {issue_count} ping exchanges in")
+            batch_timer = boe.log_timer(f"Started {batch_size} ping exchanges in")
         else:
-            recv_timer = faber.log_timer(
+            recv_timer = boe.log_timer(
                 f"Completed {issue_count} credential exchanges in"
             )
-            batch_timer = faber.log_timer(
+            batch_timer = boe.log_timer(
                 f"Started {batch_size} credential exchanges in"
             )
         recv_timer.start()
@@ -478,14 +478,14 @@ async def main(
                     completed = f"Done starting {issue_count} credential exchanges in"
 
                 issue_task = asyncio.ensure_future(
-                    check_received(faber, issue_count, issue_pg)
+                    check_received(boe, issue_count, issue_pg)
                 )
-                issue_task.add_done_callback(faber.check_task_exception)
+                issue_task.add_done_callback(boe.check_task_exception)
                 receive_task = asyncio.ensure_future(
-                    check_received(alice, issue_count, receive_pg)
+                    check_received(beeds_user, issue_count, receive_pg)
                 )
-                receive_task.add_done_callback(alice.check_task_exception)
-                with faber.log_timer(completed):
+                receive_task.add_done_callback(beeds_user.check_task_exception)
+                with boe.log_timer(completed):
                     for idx in range(0, issue_count):
                         await send(idx + 1)
                         if not (idx + 1) % batch_size and idx < issue_count - 1:
@@ -502,63 +502,63 @@ async def main(
         avg = recv_timer.duration / issue_count
         item_short = "ping" if action == "ping" else "cred"
         item_long = "ping exchange" if action == "ping" else "credential"
-        faber.log(f"Average time per {item_long}: {avg:.2f}s ({1/avg:.2f}/s)")
+        boe.log(f"Average time per {item_long}: {avg:.2f}s ({1/avg:.2f}/s)")
 
-        if alice.postgres:
-            await alice.collect_postgres_stats(f"{issue_count} {item_short}s")
-            for line in alice.format_postgres_stats():
-                alice.log(line)
-        if faber.postgres:
-            await faber.collect_postgres_stats(f"{issue_count} {item_short}s")
-            for line in faber.format_postgres_stats():
-                faber.log(line)
+        if beeds_user.postgres:
+            await beeds_user.collect_postgres_stats(f"{issue_count} {item_short}s")
+            for line in beeds_user.format_postgres_stats():
+                beeds_user.log(line)
+        if boe.postgres:
+            await boe.collect_postgres_stats(f"{issue_count} {item_short}s")
+            for line in boe.format_postgres_stats():
+                boe.log(line)
 
-        if revocation and faber.revocations:
-            (rev_reg_id, cred_rev_id) = next(iter(faber.revocations))
+        if revocation and boe.revocations:
+            (rev_reg_id, cred_rev_id) = next(iter(boe.revocations))
             print(
                 f"Revoking and publishing cred rev id {cred_rev_id} "
                 f"from rev reg id {rev_reg_id}"
             )
 
         if show_timing:
-            timing = await alice.fetch_timing()
+            timing = await beeds_user.fetch_timing()
             if timing:
-                for line in alice.format_timing(timing):
-                    alice.log(line)
+                for line in beeds_user.format_timing(timing):
+                    beeds_user.log(line)
 
-            timing = await faber.fetch_timing()
+            timing = await boe.fetch_timing()
             if timing:
-                for line in faber.format_timing(timing):
-                    faber.log(line)
+                for line in boe.format_timing(timing):
+                    boe.log(line)
             if mediation:
-                timing = await alice_mediator_agent.fetch_timing()
+                timing = await beeds_user_mediator_agent.fetch_timing()
                 if timing:
-                    for line in alice_mediator_agent.format_timing(timing):
-                        alice_mediator_agent.log(line)
-                timing = await faber_mediator_agent.fetch_timing()
+                    for line in beeds_user_mediator_agent.format_timing(timing):
+                        beeds_user_mediator_agent.log(line)
+                timing = await boe_mediator_agent.fetch_timing()
                 if timing:
-                    for line in faber_mediator_agent.format_timing(timing):
-                        faber_mediator_agent.log(line)
+                    for line in boe_mediator_agent.format_timing(timing):
+                        boe_mediator_agent.log(line)
 
     finally:
         terminated = True
         try:
-            if alice:
-                await alice.terminate()
+            if beeds_user:
+                await beeds_user.terminate()
         except Exception:
             LOGGER.exception("Error terminating agent:")
             terminated = False
         try:
-            if faber:
-                await faber.terminate()
+            if boe:
+                await boe.terminate()
         except Exception:
             LOGGER.exception("Error terminating agent:")
             terminated = False
         try:
-            if alice_mediator_agent:
-                await alice_mediator_agent.terminate()
-            if faber_mediator_agent:
-                await faber_mediator_agent.terminate()
+            if beeds_user_mediator_agent:
+                await beeds_user_mediator_agent.terminate()
+            if boe_mediator_agent:
+                await boe_mediator_agent.terminate()
         except Exception:
             LOGGER.exception("Error terminating agent:")
             terminated = False

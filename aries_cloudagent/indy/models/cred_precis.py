@@ -59,7 +59,7 @@ class IndyCredInfoSchema(BaseModelSchema):
     attrs = fields.Dict(
         description="Attribute names and value",
         keys=fields.Str(example="userid"),  # marshmallow/apispec v3.0 ignores
-        values=fields.Str(example="alice"),
+        values=fields.Str(example="beeds_user"),
     )
     schema_id = fields.Str(
         description="Schema identifier",

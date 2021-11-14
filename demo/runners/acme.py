@@ -168,7 +168,7 @@ async def main(args):
                 # TODO credential offers
 
             elif option == "2":
-                log_status("#20 Request proof of degree from alice")
+                log_status("#20 Request proof of identification from beeds_user")
                 # TODO presentation requests
 
             elif option == "3":

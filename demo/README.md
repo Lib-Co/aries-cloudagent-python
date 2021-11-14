@@ -5,7 +5,7 @@ There are several demos available for ACA-Py mostly (but not only) aimed at deve
 ## Table of Contents <!-- omit in toc -->
 
 - [The IIWBook Demo](#the-iiwbook-demo)
-- [The Alice/Faber Python demo](#the-alicefaber-python-demo)
+- [The Alice/Faber Python demo](#the-beeds_userboe-python-demo)
   - [Running in a Browser](#running-in-a-browser)
   - [Running in Docker](#running-in-docker)
   - [Running Locally](#running-locally)
@@ -14,18 +14,18 @@ There are several demos available for ACA-Py mostly (but not only) aimed at deve
     - [Genesis File handling](#genesis-file-handling)
     - [Run a local Postgres instance](#run-a-local-postgres-instance)
     - [Optional: Run a von-network ledger browser](#optional-run-a-von-network-ledger-browser)
-    - [Run the Alice and Faber Controllers/Agents](#run-the-alice-and-faber-controllersagents)
+    - [Run the Alice and Faber Controllers/Agents](#run-the-beeds_user-and-boe-controllersagents)
   - [Follow The Script](#follow-the-script)
     - [Exchanging Messages](#exchanging-messages)
     - [Issuing and Proving Credentials](#issuing-and-proving-credentials)
-- [Additional Options in the Alice/Faber demo](#additional-options-in-the-alicefaber-demo)
+- [Additional Options in the Alice/Faber demo](#additional-options-in-the-beeds_userboe-demo)
   - [Revocation](#revocation)
   - [Mediation](#mediation)
   - [Multi-tenancy](#multi-tenancy)
   - [DID Exchange](#did-exchange)
   - [Endorser](#endorser)
   - [Run Askar Backend](#run-askar-backend)
-- [Learning about the Alice/Faber code](#learning-about-the-alicefaber-code)
+- [Learning about the Alice/Faber code](#learning-about-the-beeds_userboe-code)
 - [OpenAPI (Swagger) Demo](#openapi-swagger-demo)
 - [Performance Demo](#performance-demo)
 - [Coding Challenge: Adding ACME](#coding-challenge-adding-acme)
@@ -45,7 +45,7 @@ In your browser, go to the docker playground service [Play with VON](http://play
 ```bash
 git clone https://github.com/hyperledger/aries-cloudagent-python
 cd aries-cloudagent-python/demo
-LEDGER_URL=http://dev.greenlight.bcovrin.vonx.io ./run_demo faber
+LEDGER_URL=http://dev.greenlight.bcovrin.vonx.io ./run_demo boe
 ```
 
 Now to start Alice's agent. Click the "+Add a new instance" button again to open another terminal session. Run the following commands to start Alice's agent:
@@ -53,7 +53,7 @@ Now to start Alice's agent. Click the "+Add a new instance" button again to open
 ```bash
 git clone https://github.com/hyperledger/aries-cloudagent-python
 cd aries-cloudagent-python/demo
-LEDGER_URL=http://dev.greenlight.bcovrin.vonx.io ./run_demo alice
+LEDGER_URL=http://dev.greenlight.bcovrin.vonx.io ./run_demo beeds_user
 ```
 
 Alice's agent is now running.
@@ -68,16 +68,16 @@ Open three `bash` shells. For Windows users, `git-bash` is highly recommended. b
 
 In the first terminal window, start `von-network` by following the [Running the Network Locally](https://github.com/bcgov/von-network#running-the-network-locally) instructions.
 
-In the second terminal, change directory into `demo` directory of your clone of this repository. Start the `faber` agent by issuing the following command:
+In the second terminal, change directory into `demo` directory of your clone of this repository. Start the `boe` agent by issuing the following command:
 
 ``` bash
-  ./run_demo faber 
+  ./run_demo boe 
 ```
 
-In the third terminal, change directory into `demo` directory of your clone of this repository. Start the `alice` agent by issuing the following command:
+In the third terminal, change directory into `demo` directory of your clone of this repository. Start the `beeds_user` agent by issuing the following command:
 
 ``` bash
-  ./run_demo alice
+  ./run_demo beeds_user
 ```
 
 Jump to the [Follow the Script](#follow-the-script) section below for further instructions. 
@@ -127,11 +127,11 @@ GENESIS_FILE=/path/to/local-genesis.txt PORT=9000 REGISTER_NEW_DIDS=true python 
 With the rest of the pieces running, you can run the Alice and Faber controllers and agents. To do so, `cd` into the `demo` folder your clone of this repo in two terminal windows and run the following, replacing the `/path/to/local-genesis.txt`.
 
 ``` bash
-GENESIS_FILE=/path/to/local-genesis.txt DEFAULT_POSTGRES=true python3 -m runners.faber --port 8020
+GENESIS_FILE=/path/to/local-genesis.txt DEFAULT_POSTGRES=true python3 -m runners.boe --port 8020
 ```
 
 ``` bash
-GENESIS_FILE=/path/to/local-genesis.txt DEFAULT_POSTGRES=true python3 -m runners.alice --port 8030
+GENESIS_FILE=/path/to/local-genesis.txt DEFAULT_POSTGRES=true python3 -m runners.beeds_user --port 8030
 ```
 
 Note that Alice and Faber will each use 5 ports, e.g. using the parameter `... --port 8020` actually uses ports 8020 through 8024. Feel free to use different ports if you want.
@@ -182,7 +182,7 @@ Note there is an option "2a" to initiate a connectionless proof - you can execut
 
 ## Additional Options in the Alice/Faber demo
 
-You can enable support for various ACA-Py features by providing additional command-line arguements when starting up `alice` or `faber`.
+You can enable support for various ACA-Py features by providing additional command-line arguements when starting up `beeds_user` or `boe`.
 
 Note that when the controller starts up the agent, it prints out the ACA-Py startup command with *all* parameters - you can inspect this command to see what parameters are provided in each case.  For more details on the parameters, just start ACA-Py with the `--help` parameter, for example:
 
@@ -192,17 +192,17 @@ Note that when the controller starts up the agent, it prints out the ACA-Py star
 
 ### Revocation
 
-To enable support for revoking credentials, run the `faber` demo with the `--revocation` option:
+To enable support for revoking credentials, run the `boe` demo with the `--revocation` option:
 
 ```bash
-./run_demo faber --revocation
+./run_demo boe --revocation
 ```
 
-Note that you don't specify this option with `alice` because it's only applicable for the credential `issuer` (who has to enable revocation when creating a credential definition, and explicitely revoke credentials as appropriate; alice doesn't have to do anything special when revocation is enabled).
+Note that you don't specify this option with `beeds_user` because it's only applicable for the credential `issuer` (who has to enable revocation when creating a credential definition, and explicitely revoke credentials as appropriate; beeds_user doesn't have to do anything special when revocation is enabled).
 
 You need to run a revocation registry in order to support revocation - the details are described in the [Alice gets a Phone](https://github.com/hyperledger/aries-cloudagent-python/blob/master/demo/AliceGetsAPhone.md#run-an-instance-of-indy-tails-server) demo instructions.
 
-Faber will setup support for revocation automatically, and you will see an extra option in faber's menu to revoke a credential:
+Faber will setup support for revocation automatically, and you will see an extra option in boe's menu to revoke a credential:
 
 ```
     (1) Issue Credential
@@ -236,7 +236,7 @@ Note that you need to Publish the revocation information to the ledger.  Once yo
 
 ### DID Exchange
 
-You can enable DID Exchange using the `--did-exchange` parameter for the `alice` and `faber` demos.
+You can enable DID Exchange using the `--did-exchange` parameter for the `beeds_user` and `boe` demos.
 
 This will use the new DID Exchange protocol when establishing connections between the agents, rather than the older Connection protocol.  There is no other affect on the operation of the agents.
 
@@ -251,28 +251,28 @@ This is described in [Endorser.md](Endorser.md)
 This runs using the askar libraries instead of indy-sdk:
 
 ```bash
-./run_demo faber --wallet-type askar
+./run_demo boe --wallet-type askar
 ```
 
 ### Mediation
 
-To enable mediation, run the `alice` or `faber` demo with the `--mediation` option:
+To enable mediation, run the `beeds_user` or `boe` demo with the `--mediation` option:
 
 ```bash
-./run_demo faber --mediation
+./run_demo boe --mediation
 ```
 
-This will start up a second "mediator" agent and automatically set the alice/faber connection to use the mediator.
+This will start up a second "mediator" agent and automatically set the beeds_user/boe connection to use the mediator.
 
 ### Multi-tenancy
 
-To enable support for multi-tenancy, run the `alice` or `faber` demo with the `--multitenant` option:
+To enable support for multi-tenancy, run the `beeds_user` or `boe` demo with the `--multitenant` option:
 
 ```bash
-./run_demo faber --multitenant
+./run_demo boe --multitenant
 ```
 
-(This option can be used with both (or either) `alice` and/or `faber`.)
+(This option can be used with both (or either) `beeds_user` and/or `boe`.)
 
 You will see an additional menu option to create new sub-wallets (or they can be considered to be "virtual agents").
 
@@ -312,11 +312,11 @@ Faber      | No public DID
 ... etc
 ```
 
-Note that `faber` will create a public DID for this wallet, and will create a schema and credential definition.
+Note that `boe` will create a public DID for this wallet, and will create a schema and credential definition.
 
-Once you have created a new wallet, you must establish a connection between `alice` and `faber` (remember that this is a new "virtual agent" and doesn't know anything about connections established for other "agents").
+Once you have created a new wallet, you must establish a connection between `beeds_user` and `boe` (remember that this is a new "virtual agent" and doesn't know anything about connections established for other "agents").
 
-In faber, create a new invitation:
+In boe, create a new invitation:
 
 ```
 [1/2/3/4/W/T/X] 4
@@ -324,7 +324,7 @@ In faber, create a new invitation:
 (... creates a new invitation ...)
 ```
 
-In alice, accept the invitation:
+In beeds_user, accept the invitation:
 
 ```
 [1/2/3/4/W/T/X] 4
@@ -357,7 +357,7 @@ This demo implements option #2 - each sub-wallet is configured with a separate c
 Run the demo (Alice or Faber) specifying *both* options:
 
 ```bash
-./run_demo faber --multitenant --mediation
+./run_demo boe --multitenant --mediation
 ```
 
 This works exactly as the *vanilla* multi-tenancy, except that all connections are mediated.
@@ -366,7 +366,7 @@ This works exactly as the *vanilla* multi-tenancy, except that all connections a
 
 These Alice and Faber scripts (in the `demo/runners` folder) implement the controller and run the agent as a sub-process (see the documentation for `aca-py`). The controller publishes a REST service to receive web hook callbacks from their agent. Note that this architecture, running the agent as a sub-process, is a variation on the documented architecture of running the controller and agent as separate processes/containers.
 
-The controllers for this demo can be found in the [alice.py](runners/alice.py) and [faber.py](runners/faber.py) files. Alice and Faber are instances of the agent class found in [agent.py](runners/support/agent.py).
+The controllers for this demo can be found in the [beeds_user.py](runners/beeds_user.py) and [boe.py](runners/boe.py) files. Alice and Faber are instances of the agent class found in [agent.py](runners/support/agent.py).
 
 ## OpenAPI (Swagger) Demo
 
@@ -378,8 +378,8 @@ Another example in the `demo/runners` folder is [performance.py](runners/perform
 
 To run the demo, make sure that you shut down any running Alice/Faber agents. Then, follow the same steps to start the Alice/Faber demo, but:
 
-* When starting the first agent, replace the agent name (e.g. `faber`) with `performance`.
-* Don't start the second agent (`alice`) at all.
+* When starting the first agent, replace the agent name (e.g. `boe`) with `performance`.
+* Don't start the second agent (`beeds_user`) at all.
 
 The script starts both agents, runs the performance test, spits out performance results and shuts down the agents. Note that this is just one demonstration of how performance metrics tracking can be done with ACA-Py.
 
@@ -393,9 +393,9 @@ Now that you have a solid foundation in using ACA-Py, time for a coding challeng
 * ACME requesting a proof of her College degree
 * ACME issuing Alice a credential after she is hired.
 
-The framework for the code is in the [acme.py](runners/acme.py) file, but the code is incomplete. Using the knowledge you gained from running demo and viewing the alice.py and faber.py code, fill in the blanks for the code.  When you are ready to test your work:
+The framework for the code is in the [acme.py](runners/acme.py) file, but the code is incomplete. Using the knowledge you gained from running demo and viewing the beeds_user.py and boe.py code, fill in the blanks for the code.  When you are ready to test your work:
 
 * Use the instructions above to start the Alice/Faber demo (above).
-* Start another terminal session and run the same commands as for "Alice", but replace "alice" with "acme".
+* Start another terminal session and run the same commands as for "Alice", but replace "beeds_user" with "acme".
 
 All done? Checkout how we added the missing code segments [here](AcmeDemoWorkshop.md).

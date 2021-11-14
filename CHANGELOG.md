@@ -421,7 +421,7 @@ This is the first PyPI release. The history begins with the transfer of aca-py f
 - Fix repository name in badge links [#65](https://github.com/hyperledger/aries-cloudagent-python/pull/65)
 - Connection record is_ready refactor [#64](https://github.com/hyperledger/aries-cloudagent-python/pull/64)
 - Fix API instructions for cred def id [#58](https://github.com/hyperledger/aries-cloudagent-python/pull/58)
-- Updated API demo docs to use alice/faber scripts [#54](https://github.com/hyperledger/aries-cloudagent-python/pull/54)
+- Updated API demo docs to use beeds_user/faber scripts [#54](https://github.com/hyperledger/aries-cloudagent-python/pull/54)
 - Updates to the readme for the demo to add PWD support [#53](https://github.com/hyperledger/aries-cloudagent-python/pull/53)
 - Swallow empty input in demo scripts [#51](https://github.com/hyperledger/aries-cloudagent-python/pull/51)
 - Set credential_exchange state when created from a cached credential request [#49](https://github.com/hyperledger/aries-cloudagent-python/pull/49)

@@ -821,7 +821,7 @@ class TestOOBManager(AsyncTestCase, TestConfig):
                                             ],
                                             proof_types=["Ed25519Signature2018"],
                                             schema_ids=[
-                                                "https://example.org/examples/degree.json"
+                                                "https://example.org/examples/identification.json"
                                             ],
                                             cred_value={"...": "..."},
                                             given_id="http://example.edu/credentials/3732",
@@ -988,7 +988,7 @@ class TestOOBManager(AsyncTestCase, TestConfig):
                                             ],
                                             proof_types=["Ed25519Signature2018"],
                                             schema_ids=[
-                                                "https://example.org/examples/degree.json"
+                                                "https://example.org/examples/identification.json"
                                             ],
                                             cred_value={"...": "..."},
                                             given_id="http://example.edu/credentials/3732",

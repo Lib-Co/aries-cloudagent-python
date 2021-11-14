@@ -21,9 +21,9 @@ if [ -z "$DOCKER_NET" ]; then
 fi
 DOCKER_VOL=""
 
-if [ "$AGENT" = "faber" ]; then
+if [ "$AGENT" = "boe" ]; then
   PTVSD_PORT=5679
-elif  [ "$AGENT" = "alice" ]; then
+elif  [ "$AGENT" = "beeds_user" ]; then
   PTVSD_PORT=5677
 fi
 
@@ -93,7 +93,7 @@ do
     continue
   ;;
   --bg)
-    if [ "${AGENT}" = "alice" ] || [ "${AGENT}" = "faber" ] || [ "${AGENT}" = "acme" ]; then
+    if [ "${AGENT}" = "beeds_user" ] || [ "${AGENT}" = "boe" ] || [ "${AGENT}" = "acme" ]; then
       DOCKER_OPTS="-d"
       echo -e "\nRunning in ${AGENT} in the background. Note that you cannot use the command line console in this mode."
       echo To see the logs use: \"docker logs ${AGENT}\".
@@ -101,7 +101,7 @@ do
       echo To stop the agent, use: \"docker stop ${AGENT}\". The docker environment will
       echo -e "be removed on stop.\n\n"
     else
-      echo The "bg" option \(for running docker in detached mode\) is only for agents Alice, Faber and Acme.
+      echo The "bg" option \(for running docker in detached mode\) is only for agents BEEDSUser, BoE and Acme.
       echo Ignoring...
     fi
     continue
@@ -110,7 +110,7 @@ do
     cat <<EOF
 Usage:
    ./demo_run <agent> [OPTIONS]
-   - <agent> is one of alice, faber, acme, performance.
+   - <agent> is one of beeds_user, boe, acme, performance.
    - Options:
       --events - display on the terminal the webhook events from the ACA-Py agent.
       --timing - at the end of the run, display timing; relevant to the "performance" agent.
@@ -128,12 +128,12 @@ EOF
   ARGS="${ARGS:+$ARGS }$i"
 done
 
-if [ "$AGENT" = "faber" ]; then
-  AGENT_MODULE="faber"
+if [ "$AGENT" = "boe" ]; then
+  AGENT_MODULE="boe"
   AGENT_PORT=8020
   AGENT_PORT_RANGE=8020-8029
-elif [ "$AGENT" = "alice" ]; then
-  AGENT_MODULE="alice"
+elif [ "$AGENT" = "beeds_user" ]; then
+  AGENT_MODULE="beeds_user"
   AGENT_PORT=8030
   AGENT_PORT_RANGE=8030-8039
 elif [ "$AGENT" = "acme" ]; then
@@ -145,12 +145,12 @@ elif [ "$AGENT" = "performance" ]; then
   AGENT_PORT=8050
   AGENT_PORT_RANGE=8050-8069
 else
-  echo "Please specify which agent you want to run. Choose from 'faber', 'alice', 'acme', or 'performance'."
+  echo "Please specify which agent you want to run. Choose from 'boe', 'beeds_user', 'acme', or 'performance'."
   exit 1
 fi
 
 echo "Preparing agent image..."
-docker build -q -t faber-alice-demo -f ../docker/Dockerfile.demo .. || exit 1
+docker build -q -t boe-beeds_user-demo -f ../docker/Dockerfile.demo .. || exit 1
 
 if [ ! -z "$DOCKERHOST" ]; then
   # provided via APPLICATION_URL environment variable
@@ -260,4 +260,4 @@ $DOCKER run --name $AGENT --rm -it ${DOCKER_OPTS} \
   $DOCKER_PUBLISH \
   ${DOCKER_VOL} \
   $DOCKER_ENV \
-  faber-alice-demo $AGENT_MODULE --port $AGENT_PORT $ARGS
+  boe-beeds_user-demo $AGENT_MODULE --port $AGENT_PORT $ARGS

@@ -14,7 +14,7 @@ TEST_SIGN_OBJ0 = {
         "issuanceDate": "2020-03-10T04:24:12.164Z",
         "credentialSubject": {
             "id": ("did:key:" "z6MkjRagNiMu91DduvCvgEsqLZDVzrJzFrwahc4tXLt9DoHd"),
-            "degree": {
+            "identification": {
                 "type": "BachelorDegree",
                 "name": "Bachelor of Science and Arts",
             },
@@ -40,7 +40,7 @@ TEST_SIGN_OBJ1 = {
         "issuanceDate": "2020-03-16T22:37:26.544Z",
         "credentialSubject": {
             "id": "did:example:123",
-            "degree": {
+            "identification": {
                 "type": "BachelorDegree",
                 "name": "Bachelor of Science and Arts",
             },
@@ -76,7 +76,7 @@ TEST_SIGN_OBJ2 = {
             {
                 "credentialSubject": {
                     "id": "did:example:123",
-                    "degree": {
+                    "identification": {
                         "type": "BachelorDegree",
                         "name": "Bachelor of Science and Arts",
                     },
@@ -201,7 +201,7 @@ TEST_VALIDATE_ERROR_OBJ2 = {
             {
                 "credentialSubject": {
                     "id": "did:example:123",
-                    "degree": {
+                    "identification": {
                         "type": "BachelorDegree",
                         "name": "Bachelor of Science and Arts",
                     },
@@ -245,7 +245,7 @@ TEST_VERIFY_OBJ0 = {
         "issuanceDate": "2020-03-10T04:24:12.164Z",
         "credentialSubject": {
             "id": ("did:key:" "z6MkjRagNiMu91DduvCvgEsqLZDVzrJzFrwahc4tXLt9DoHd"),
-            "degree": {
+            "identification": {
                 "type": "BachelorDegree",
                 "name": "Bachelor of Science and Arts",
             },
@@ -281,7 +281,7 @@ TEST_VERIFY_OBJ1 = {
         "issuanceDate": "2020-03-16T22:37:26.544Z",
         "credentialSubject": {
             "id": "did:example:123",
-            "degree": {
+            "identification": {
                 "type": "BachelorDegree",
                 "name": "Bachelor of Science and Arts",
             },
@@ -320,7 +320,7 @@ TEST_VERIFY_OBJ2 = {
             {
                 "credentialSubject": {
                     "id": "did:example:123",
-                    "degree": {
+                    "identification": {
                         "type": "BachelorDegree",
                         "name": "Bachelor of Science and Arts",
                     },
@@ -366,7 +366,7 @@ TEST_VERIFY_ERROR = {
         "issuanceDate": "2020-03-10T04:24:12.164Z",
         "credentialSubject": {
             "id": ("did:key:" "z6MkjRagNiMu91DduvCvgEsqLZDVzrJzFrwahc4tXLt9DoHd"),
-            "degree": {
+            "identification": {
                 "type": "BachelorDegree",
                 "name": "Bachelor of Science and Arts",
             },

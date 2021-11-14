@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.WARNING)
 LOGGER = logging.getLogger(__name__)
 
 
-class AliceAgent(AriesAgent):
+class BEEDSUserAgent(AriesAgent):
     def __init__(
         self,
         ident: str,
@@ -42,7 +42,7 @@ class AliceAgent(AriesAgent):
             ident,
             http_port,
             admin_port,
-            prefix="Alice",
+            prefix="BEEDSUser",
             no_auto=no_auto,
             seed=None,
             aip=aip,
@@ -104,44 +104,44 @@ async def input_invitation(agent_container):
 
 
 async def main(args):
-    alice_agent = await create_agent_with_args(args, ident="alice")
+    beeds_user_agent = await create_agent_with_args(args, ident="beeds_user")
 
     try:
         log_status(
             "#7 Provision an agent and wallet, get back configuration details"
             + (
-                f" (Wallet type: {alice_agent.wallet_type})"
-                if alice_agent.wallet_type
+                f" (Wallet type: {beeds_user_agent.wallet_type})"
+                if beeds_user_agent.wallet_type
                 else ""
             )
         )
-        agent = AliceAgent(
-            "alice.agent",
-            alice_agent.start_port,
-            alice_agent.start_port + 1,
-            genesis_data=alice_agent.genesis_txns,
-            no_auto=alice_agent.no_auto,
-            tails_server_base_url=alice_agent.tails_server_base_url,
-            timing=alice_agent.show_timing,
-            multitenant=alice_agent.multitenant,
-            mediation=alice_agent.mediation,
-            wallet_type=alice_agent.wallet_type,
-            aip=alice_agent.aip,
-            endorser_role=alice_agent.endorser_role,
+        agent = BEEDSUserAgent(
+            "beeds_user.agent",
+            beeds_user_agent.start_port,
+            beeds_user_agent.start_port + 1,
+            genesis_data=beeds_user_agent.genesis_txns,
+            no_auto=beeds_user_agent.no_auto,
+            tails_server_base_url=beeds_user_agent.tails_server_base_url,
+            timing=beeds_user_agent.show_timing,
+            multitenant=beeds_user_agent.multitenant,
+            mediation=beeds_user_agent.mediation,
+            wallet_type=beeds_user_agent.wallet_type,
+            aip=beeds_user_agent.aip,
+            endorser_role=beeds_user_agent.endorser_role,
         )
 
-        await alice_agent.initialize(the_agent=agent)
+        await beeds_user_agent.initialize(the_agent=agent)
 
-        log_status("#9 Input faber.py invitation details")
-        await input_invitation(alice_agent)
+        log_status("#9 Input boe.py invitation details")
+        await input_invitation(beeds_user_agent)
 
         options = "    (3) Send Message\n" "    (4) Input New Invitation\n"
-        if alice_agent.endorser_role and alice_agent.endorser_role == "author":
+        if beeds_user_agent.endorser_role and beeds_user_agent.endorser_role == "author":
             options += "    (D) Set Endorser's DID\n"
-        if alice_agent.multitenant:
+        if beeds_user_agent.multitenant:
             options += "    (W) Create and/or Enable Wallet\n"
         options += "    (X) Exit?\n[3/4/{}X] ".format(
-            "W/" if alice_agent.multitenant else "",
+            "W/" if beeds_user_agent.multitenant else "",
         )
         async for option in prompt_loop(options):
             if option is not None:
@@ -150,51 +150,51 @@ async def main(args):
             if option is None or option in "xX":
                 break
 
-            elif option in "dD" and alice_agent.endorser_role:
+            elif option in "dD" and beeds_user_agent.endorser_role:
                 endorser_did = await prompt("Enter Endorser's DID: ")
-                await alice_agent.agent.admin_POST(
-                    f"/transactions/{alice_agent.agent.connection_id}/set-endorser-info",
+                await beeds_user_agent.agent.admin_POST(
+                    f"/transactions/{beeds_user_agent.agent.connection_id}/set-endorser-info",
                     params={"endorser_did": endorser_did, "endorser_name": "endorser"},
                 )
 
-            elif option in "wW" and alice_agent.multitenant:
+            elif option in "wW" and beeds_user_agent.multitenant:
                 target_wallet_name = await prompt("Enter wallet name: ")
                 include_subwallet_webhook = await prompt(
                     "(Y/N) Create sub-wallet webhook target: "
                 )
                 if include_subwallet_webhook.lower() == "y":
-                    await alice_agent.agent.register_or_switch_wallet(
+                    await beeds_user_agent.agent.register_or_switch_wallet(
                         target_wallet_name,
-                        webhook_port=alice_agent.agent.get_new_webhook_port(),
-                        mediator_agent=alice_agent.mediator_agent,
+                        webhook_port=beeds_user_agent.agent.get_new_webhook_port(),
+                        mediator_agent=beeds_user_agent.mediator_agent,
                     )
                 else:
-                    await alice_agent.agent.register_or_switch_wallet(
+                    await beeds_user_agent.agent.register_or_switch_wallet(
                         target_wallet_name,
-                        mediator_agent=alice_agent.mediator_agent,
+                        mediator_agent=beeds_user_agent.mediator_agent,
                     )
 
             elif option == "3":
                 msg = await prompt("Enter message: ")
                 if msg:
-                    await alice_agent.agent.admin_POST(
-                        f"/connections/{alice_agent.agent.connection_id}/send-message",
+                    await beeds_user_agent.agent.admin_POST(
+                        f"/connections/{beeds_user_agent.agent.connection_id}/send-message",
                         {"content": msg},
                     )
 
             elif option == "4":
                 # handle new invitation
                 log_status("Input new invitation details")
-                await input_invitation(alice_agent)
+                await input_invitation(beeds_user_agent)
 
-        if alice_agent.show_timing:
-            timing = await alice_agent.agent.fetch_timing()
+        if beeds_user_agent.show_timing:
+            timing = await beeds_user_agent.agent.fetch_timing()
             if timing:
-                for line in alice_agent.agent.format_timing(timing):
+                for line in beeds_user_agent.agent.format_timing(timing):
                     log_msg(line)
 
     finally:
-        terminated = await alice_agent.terminate()
+        terminated = await beeds_user_agent.terminate()
 
     await asyncio.sleep(0.1)
 
@@ -203,7 +203,7 @@ async def main(args):
 
 
 if __name__ == "__main__":
-    parser = arg_parser(ident="alice", port=8030)
+    parser = arg_parser(ident="beeds_user", port=8030)
     args = parser.parse_args()
 
     ENABLE_PTVSD = os.getenv("ENABLE_PTVSD_FABER", "").lower()
@@ -236,7 +236,7 @@ if __name__ == "__main__":
             import pydevd_pycharm
 
             print(
-                "Alice remote debugging to "
+                "beeds_user remote debugging to "
                 f"{PYDEVD_PYCHARM_HOST}:{PYDEVD_PYCHARM_CONTROLLER_PORT}"
             )
             pydevd_pycharm.settrace(

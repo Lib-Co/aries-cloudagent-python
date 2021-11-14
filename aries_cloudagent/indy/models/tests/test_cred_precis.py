@@ -12,7 +12,7 @@ REV_REG_ID = f"{TEST_DID}:4:{CRED_DEF_ID}:CL_ACCUM:0"
 CRED_INFO = {
     "referent": "abc123",
     "attrs": {
-        "userid": "alice",
+        "userid": "beeds_user",
         "dob": "2000-01-01",
         "favourite_colour": "purple",
     },

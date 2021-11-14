@@ -104,7 +104,7 @@ class VCRecordSchema(BaseModelSchema):
     schema_ids = fields.List(
         fields.Str(
             description="Schema identifier",
-            example="https://example.org/examples/degree.json",
+            example="https://example.org/examples/identification.json",
         )
     )
     issuer_id = fields.Str(

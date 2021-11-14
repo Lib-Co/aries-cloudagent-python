@@ -507,7 +507,7 @@ class AriesAgent(DemoAgent):
         with log_timer("Generate invitation duration:"):
             # Generate an invitation
             log_status(
-                "#7 Create a connection to alice and print out the invite details"
+                "#7 Create a connection to beeds_user and print out the invite details"
             )
             invi_rec = await self.get_invite(use_did_exchange, auto_accept)
 
@@ -806,7 +806,7 @@ class AgentContainer:
         return matched
 
     async def request_proof(self, proof_request):
-        log_status("#20 Request proof of degree from alice")
+        log_status("#20 Request proof of identification from beeds_user")
 
         if self.cred_type == CRED_FORMAT_INDY:
             indy_proof_request = {
@@ -980,7 +980,7 @@ def arg_parser(ident: str = None, port: int = 8020):
     """
     Standard command-line arguements.
 
-    "ident", if specified, refers to one of the standard demo personas - alice, faber, acme or performance.
+    "ident", if specified, refers to one of the standard demo personas - beeds_user, boe, acme or performance.
     """
     parser = argparse.ArgumentParser(
         description="Runs a " + (ident or "aries") + " demo agent."
@@ -1010,7 +1010,7 @@ def arg_parser(ident: str = None, port: int = 8020):
         metavar=("<port>"),
         help="Choose the starting port number to listen on",
     )
-    if (not ident) or (ident != "alice"):
+    if (not ident) or (ident != "beeds_user"):
         parser.add_argument(
             "--did-exchange",
             action="store_true",
@@ -1025,7 +1025,7 @@ def arg_parser(ident: str = None, port: int = 8020):
         metavar=("<tails-server-base-url>"),
         help="Tails server base url",
     )
-    if (not ident) or (ident != "alice"):
+    if (not ident) or (ident != "beeds_user"):
         parser.add_argument(
             "--cred-type",
             type=str,
@@ -1187,13 +1187,13 @@ async def test_main(
 ):
     """Test to startup a couple of agents."""
 
-    faber_container = None
-    alice_container = None
+    boe_container = None
+    beeds_user_container = None
     try:
         # initialize the containers
-        faber_container = AgentContainer(
+        boe_container = AgentContainer(
             genesis,
-            "Faber.agent",
+            "BoE.agent",
             start_port,
             no_auto=no_auto,
             revocation=revocation,
@@ -1208,9 +1208,9 @@ async def test_main(
             cred_type=cred_type,
             aip=aip,
         )
-        alice_container = AgentContainer(
+        beeds_user_container = AgentContainer(
             genesis,
-            "Alice.agent",
+            "BEEDSUser.agent",
             start_port + 10,
             no_auto=no_auto,
             revocation=False,
@@ -1224,31 +1224,31 @@ async def test_main(
             aip=aip,
         )
 
-        # start the agents - faber gets a public DID and schema/cred def
-        await faber_container.initialize(
-            schema_name="degree schema",
+        # start the agents - boe gets a public DID and schema/cred def
+        await boe_container.initialize(
+            schema_name="identification schema",
             schema_attrs=[
                 "name",
                 "date",
-                "degree",
+                "identification",
                 "grade",
             ],
         )
-        await alice_container.initialize()
+        await beeds_user_container.initialize()
 
-        # faber create invitation
-        invite = await faber_container.generate_invitation()
+        # boe create invitation
+        invite = await boe_container.generate_invitation()
 
-        # alice accept invitation
+        # beeds_user accept invitation
         invite_details = invite["invitation"]
-        connection = await alice_container.input_invitation(invite_details)
+        connection = await beeds_user_container.input_invitation(invite_details)
 
-        # wait for faber connection to activate
-        await faber_container.detect_connection()
-        await alice_container.detect_connection()
+        # wait for boe connection to activate
+        await boe_container.detect_connection()
+        await beeds_user_container.detect_connection()
 
-        # TODO faber issue credential to alice
-        # TODO alice check for received credential
+        # TODO boe issue credential to beeds_user
+        # TODO beeds_user check for received credential
 
         log_msg("Sleeping ...")
         await asyncio.sleep(3.0)
@@ -1261,12 +1261,12 @@ async def test_main(
         terminated = True
         try:
             # shut down containers at the end of the test
-            if alice_container:
-                log_msg("Shutting down alice agent ...")
-                await alice_container.terminate()
-            if faber_container:
-                log_msg("Shutting down faber agent ...")
-                await faber_container.terminate()
+            if beeds_user_container:
+                log_msg("Shutting down beeds_user agent ...")
+                await beeds_user_container.terminate()
+            if boe_container:
+                log_msg("Shutting down boe agent ...")
+                await boe_container.terminate()
         except Exception as e:
             LOGGER.exception("Error terminating agent:", e)
             terminated = False
