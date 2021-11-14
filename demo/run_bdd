@@ -92,7 +92,7 @@ do
       echo To stop the agent, use: \"docker stop ${AGENT}\". The docker environment will
       echo -e "be removed on stop.\n\n"
     else
-      echo The "bg" option \(for running docker in detached mode\) is only for agents Alice, Faber and Acme.
+      echo The "bg" option \(for running docker in detached mode\) is only for agents BEEDSUser, BoE and Acme.
       echo Ignoring...
     fi
     continue

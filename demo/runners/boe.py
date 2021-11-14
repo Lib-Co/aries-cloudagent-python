@@ -51,7 +51,7 @@ class BoEAgent(AriesAgent):
             ident,
             http_port,
             admin_port,
-            prefix="boe",
+            prefix="BoE",
             no_auto=no_auto,
             endorser_role=endorser_role,
             **kwargs,
@@ -72,17 +72,21 @@ class BoEAgent(AriesAgent):
         return self._connection_ready.done() and self._connection_ready.result()
 
     def generate_credential_offer(self, aip, cred_type, cred_def_id, exchange_tracing):
-        age = 24
         d = datetime.date.today()
-        birth_date = datetime.date(d.year - age, d.month, d.day)
-        birth_date_format = "%Y%m%d"
         if aip == 10:
             # define attributes to send for credential
             self.cred_attrs[cred_def_id] = {
-                "name": "Alice Smith",
-                "date": "2018-05-28",
-                "identification": "Maths",
-                "birthdate_dateint": birth_date.strftime(birth_date_format),
+                #"first_name": await prompt("Enter First Name: "),
+                #"surname": await prompt("Enter Surname: "),
+                #"firm_name": await prompt("Enter Firm Name: "),
+                #"lei": await prompt("Enter Firm LEI: "),
+                #"user_role": "Principal User",
+                #"timestamp": str(int(time.time())),
+                "first_name": "test",
+                "surname": "test",
+                "firm_name": "test",
+                "lei": "test",
+                "user_role": "test",
                 "timestamp": str(int(time.time())),
             }
 
@@ -106,10 +110,19 @@ class BoEAgent(AriesAgent):
         elif aip == 20:
             if cred_type == CRED_FORMAT_INDY:
                 self.cred_attrs[cred_def_id] = {
-                    "name": "Alice Smith",
-                    "date": "2018-05-28",
-                    "identification": "Maths",
-                    "birthdate_dateint": birth_date.strftime(birth_date_format),
+                    #"first_name": await prompt("Enter First Name: "),
+                    #"surname": await prompt("Enter Surname: "),
+                    #"firm_name": await prompt("Enter Firm Name: "),
+                    #"lei": await prompt("Enter Firm LEI: "),
+                    #"user_role": "Principal User",
+                    #"timestamp": str(int(time.time())),
+                    #await
+
+                    "first_name": "test",
+                    "surname": "test",
+                    "firm_name": "test",
+                    "lei": "test",
+                    "user_role": "test",
                     "timestamp": str(int(time.time())),
                 }
 
@@ -145,16 +158,17 @@ class BoEAgent(AriesAgent):
                                     "VerifiableCredential",
                                     "PermanentResident",
                                 ],
-                                "id": "https://credential.example.com/residents/1234567890",
+                                "id": "https://credential.example.com/reporter/1234567890",
                                 "issuer": self.did,
                                 "issuanceDate": "2020-01-01T12:00:00Z",
                                 "credentialSubject": {
-                                    "type": ["PermanentResident"],
-                                    "givenName": "ALICE",
-                                    "familyName": "SMITH",
-                                    "gender": "Female",
-                                    "birthCountry": "Bahamas",
-                                    "birthDate": "1958-07-17",
+                                    "type": ["PRARegulatedReporter"],
+                                    "first_name": "TEST",
+                                    "surname": "TEST",
+                                    "firm_name": "TEST",
+                                    "lei": "TEST",
+                                    "user_role": "TEST",
+                                    "timestamp": "TEST",
                                 },
                             },
                             "options": {"proofType": SIG_TYPE_BLS},
@@ -172,10 +186,7 @@ class BoEAgent(AriesAgent):
     def generate_proof_request_web_request(
         self, aip, cred_type, revocation, exchange_tracing, connectionless=False
     ):
-        age = 18
-        d = datetime.date.today()
-        birth_date = datetime.date(d.year - age, d.month, d.day)
-        birth_date_format = "%Y%m%d"
+
         if aip == 10:
             req_attrs = [
                 {
@@ -209,15 +220,15 @@ class BoEAgent(AriesAgent):
                 )
             req_preds = [
                 # test zero-knowledge proofs
-                {
-                    "name": "birthdate_dateint",
-                    "p_type": "<=",
-                    "p_value": int(birth_date.strftime(birth_date_format)),
-                    "restrictions": [{"schema_name": "identification schema"}],
-                }
+                #{
+                    #"name": "birthdate_dateint",
+                    #"p_type": "<=",
+                    #"p_value": int(birth_date.strftime(birth_date_format)),
+                    #"restrictions": [{"schema_name": "identification schema"}],
+                #}
             ]
             indy_proof_request = {
-                "name": "Proof of Education",
+                "name": "Proof of Firm LEI",
                 "version": "1.0",
                 "requested_attributes": {
                     f"0_{req_attr['name']}_uuid": req_attr for req_attr in req_attrs
@@ -274,14 +285,14 @@ class BoEAgent(AriesAgent):
                 req_preds = [
                     # test zero-knowledge proofs
                     {
-                        "name": "birthdate_dateint",
-                        "p_type": "<=",
-                        "p_value": int(birth_date.strftime(birth_date_format)),
-                        "restrictions": [{"schema_name": "identification schema"}],
+                        #"name": "birthdate_dateint",
+                        #"p_type": "<=",
+                        #"p_value": int(birth_date.strftime(birth_date_format)),
+                        #"restrictions": [{"schema_name": "identification schema"}],
                     }
                 ]
                 indy_proof_request = {
-                    "name": "Proof of Education",
+                    "name": "Proof of Firm LEI",
                     "version": "1.0",
                     "requested_attributes": {
                         f"0_{req_attr['name']}_uuid": req_attr for req_attr in req_attrs
@@ -401,10 +412,11 @@ async def main(args):
 
         boe_schema_name = "identification schema"
         boe_schema_attrs = [
-            "name",
-            "date",
-            "identification",
-            "birthdate_dateint",
+            "first_name",
+            "surname",
+            "firm_name",
+            "lei",
+            "user_role",
             "timestamp",
         ]
         if boe_agent.cred_type == CRED_FORMAT_INDY:
