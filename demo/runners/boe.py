@@ -84,16 +84,10 @@ class BoEAgent(AriesAgent):
             # define attributes to send for credential
             self.cred_attrs[cred_def_id] = {
                 "first_name": first_name,
-                #"surname": await prompt("Enter Surname: "),
-                #"firm_name": await prompt("Enter Firm Name: "),
-                #"lei": await prompt("Enter Firm LEI: "),
-                #"user_role": "Principal User",
-                #"timestamp": str(int(time.time())),
-                #"first_name": "test",
-                "surname": "test",
-                "firm_name": "test",
-                "lei": "test",
-                "user_role": "test",
+                "surname": "Smith",
+                "firm_name": "Bank123",
+                "lei": "ABCDEFGHI1234546789",
+                "user_role": "Principal User",
                 "valid_to_dateint": valid_to.strftime(valid_to_format),
                 "timestamp": str(int(time.time())),
             }
@@ -118,19 +112,11 @@ class BoEAgent(AriesAgent):
         elif aip == 20:
             if cred_type == CRED_FORMAT_INDY:
                 self.cred_attrs[cred_def_id] = {
-                    #"first_name": await prompt("Enter First Name: "),
-                    #"surname": await prompt("Enter Surname: "),
-                    #"firm_name": await prompt("Enter Firm Name: "),
-                    #"lei": await prompt("Enter Firm LEI: "),
-                    #"user_role": "Principal User",
-                    #"timestamp": str(int(time.time())),
-                    
                     "first_name": first_name,
-                    #"first_name": "test",
-                    "surname": "test",
-                    "firm_name": "test",
-                    "lei": "test",
-                    "user_role": "test",
+                    "surname": "Smith",
+                    "firm_name": "Bank123",
+                    "lei": "ABCDEFGHI1234546789",
+                    "user_role": "Principal User",
                     "valid_to_dateint": valid_to.strftime(valid_to_format),
                     "timestamp": str(int(time.time())),
                 }
@@ -194,8 +180,7 @@ class BoEAgent(AriesAgent):
             raise Exception(f"Error invalid AIP level: {self.aip}")
 
     def generate_proof_request_web_request(
-        self, aip, cred_type, revocation, exchange_tracing, connectionless=False
-    ):
+        self, aip, cred_type, revocation, exchange_tracing, connectionless=False):       
         expiration_period = 1
         d = datetime.date.today()
         valid_to = datetime.date(d.year + expiration_period, d.month, d.day)
