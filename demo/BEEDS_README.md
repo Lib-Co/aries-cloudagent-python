@@ -4,6 +4,8 @@
 - Docker installed / Access to Docker Play 
 - Python v3
 
+For any additional information, please refer to the README.md file.
+
 
 ## Steps to run demonstration
 
@@ -20,7 +22,7 @@
 
 ## Revocation functionality
 
-To view how the credential can also be revoked (using accumulators), the following command can be run from aries-cloudagent-pythin/demo:'./run_demo boe --revocation' 
+To view how the credential can also be revoked (using accumulators), the following command can be run from aries-cloudagent-pythin/demo:'./run_demo boe --aip 20 --revocation' 
 
 Please note that the --revocation argument will only function as expected after the './run_demo boe' has alreday been run first in each VON-network session.  
 
